@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Engineering Notation Practice</title>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #f8fafc; padding: 20px; display: flex; justify-content: center; }
+    .card { background: white; border-radius: 12px; padding: 24px; max-width: 450px; width: 100%; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; }
+    .value { font-size: 2rem; font-weight: bold; color: #1e293b; margin: 20px 0; background: #f1f5f9; padding: 15px; border-radius: 8px; }
+    input { font-size: 1.1rem; padding: 10px; width: 70%; margin-bottom: 15px; border: 1px solid #cbd5e1; border-radius: 6px; text-align: center; }
+    button { font-size: 1rem; padding: 10px 18px; margin: 4px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+    .btn-submit { background: #2563eb; color: white; }
+    .btn-next { background: #475569; color: white; }
+    .feedback { font-weight: bold; margin-top: 15px; min-height: 24px; }
+    .success { color: #16a34a; }
+    .error { color: #dc2626; }
+    .hint { font-size: 0.9rem; color: #64748b; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h2>Engineering Notation Drill</h2>
+  <p>Convert the value below to standard SI Engineering Notation (e.g., 250 mA, 10k Ω, 2.2 uF):</p>
+  
+  <div class="value" id="improper-val">Loading...</div>
+  
+  <input type="text" id="user-input" placeholder="e.g. 250 mA" autocomplete="off" />
+  <br>
+  <button class="btn-submit" onclick="checkAnswer()">Submit</button>
+  <button class="btn-next" onclick="generateProblem()">Next Card</button>
+  
+  <div class="feedback" id="feedback"></div>
+  <div class="hint" id="hint"></div>
+</div>
+
+<script>
+const units = ['A', 'V', 'Ω', 'F', 'Hz'];
+const prefixes = [
+  { exp: -12, sym: 'p' }, { exp: -9, sym: 'n' }, { exp: -6, sym: 'u' },
+  { exp: -3, sym: 'm' },  { exp: 3, sym: 'k' },  { exp: 6, sym: 'M' }, { exp: 9, sym: 'G' }
+];
+
+let currentSolution = "";
+let currentHint = "";
+
+function generateProblem() {
+  document.getElementById('feedback').innerText = "";
+  document.getElementById('feedback').className = "feedback";
+  document.getElementById('hint').innerText = "";
+  document.getElementById('user-input').value = "";
+
+  const unit = units[Math.floor(Math.random() * units.length)];
+  const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+  const baseNum = (Math.random() * 899 + 100) / 100; // 1.00 to 9.99 or 1 to 999
+  const val = Math.round(baseNum * 100) / 100;
+
+  const rawVal = val * Math.pow(10, prefix.exp);
+  let displayVal = rawVal >= 1 ? rawVal.toLocaleString('en-US') : rawVal.toFixed(Math.abs(prefix.exp) + 2).replace(/\.?0+$/, "");
+
+  document.getElementById('improper-val').innerText = `${displayVal} ${unit}`;
+  currentSolution = `${val}${prefix.sym}${unit}`;
+  currentHint = `${displayVal} ${unit} = ${val} × 10^(${prefix.exp}) ${unit} → ${val} ${prefix.sym}${unit}`;
+}
+
+function checkAnswer() {
+  const input = document.getElementById('user-input').value.replace(/\s+/g, '').toLowerCase();
+  const target = currentSolution.replace(/\s+/g, '').toLowerCase();
+
+  const feedback = document.getElementById('feedback');
+  if (input === target) {
+    feedback.innerText = "Correct! Great job.";
+    feedback.className = "feedback success";
+  } else {
+    feedback.innerText = "Not quite. Try again!";
+    feedback.className = "feedback error";
+    document.getElementById('hint').innerText = `Step-by-step: ${currentHint}`;
+  }
+}
+
+generateProblem();
+</script>
+
+</body>
+</html>
